@@ -6,13 +6,13 @@ package eu.justas.geoip.rest;
 
 import au.com.bytecode.opencsv.CSVReader;
 import eu.justas.geoip.model.Location;
+import eu.justas.geoip.utils.InjectedConfiguration;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -21,14 +21,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 
 /**
  *
@@ -38,10 +32,12 @@ import javax.ws.rs.Produces;
 @Path("location")
 public class LocationFacadeREST extends AbstractFacade<Location> {
 
+    private static final Logger LOG = Logger.getLogger(LocationFacadeREST.class.getName());
     @PersistenceContext(unitName = "geoip-PU")
     private EntityManager em;
-    @EJB
-    private NetworkEntryFacadeREST networkEntryFacadeREST;
+    @Inject
+    @InjectedConfiguration(key = "import.location.file", defaultValue = "/tmp/GeoLiteCity-Location.csv")
+    String importFile;
 
     public LocationFacadeREST() {
         super(Location.class);
@@ -49,16 +45,15 @@ public class LocationFacadeREST extends AbstractFacade<Location> {
 
     @GET
     @Path("import")
-    public void doImport() {
-        networkEntryFacadeREST.doImport();
-
+    public String doImport() {
         long startTime = System.currentTimeMillis();
         CSVReader reader = null;
         try {
-            String fName = "/Users/justas/Desktop/tmp/GeoLiteCity_20130806/GeoLiteCity-Location.csv";
-            reader = new CSVReader(new FileReader(fName));
-            String[] string = reader.readNext();
-            System.out.println("Started Location import");
+            reader = new CSVReader(new FileReader(importFile));
+            String[] string;
+            reader.readNext();
+            LOG.log(Level.INFO, "Started Location import");
+
 
             long count = 0;
             reader.readNext();
@@ -77,10 +72,8 @@ public class LocationFacadeREST extends AbstractFacade<Location> {
                 Location location = new Location(extId, countryCode, region, city, postalCode, latitude, longtitude, metroCode, areaCode);
                 super.create(location);
                 string = reader.readNext();
-
             }
-
-            System.out.println("Count ======= " + count);
+            LOG.log(Level.INFO, "Location insert count: {0}", count);
         } catch (Exception ex) {
             Logger.getLogger(NetworkEntryFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -88,60 +81,15 @@ public class LocationFacadeREST extends AbstractFacade<Location> {
                 try {
                     reader.close();
                 } catch (IOException ex) {
-                    Logger.getLogger(NetworkEntryFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+                    LOG.log(Level.SEVERE, null, ex);
                 }
             }
         }
         long endTime = System.currentTimeMillis();
         long seconds = (endTime - startTime) / 1000;
-        System.out.println("Import took: " + seconds);
+        LOG.log(Level.INFO, "Location import took: {0} s", seconds);
+        return "done";
 
-
-    }
-
-    @POST
-    @Override
-    @Consumes({"application/xml", "application/json"})
-    public void create(Location entity) {
-        super.create(entity);
-    }
-
-    @PUT
-    @Override
-    @Consumes({"application/xml", "application/json"})
-    public void edit(Location entity) {
-        super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") Long id) {
-        super.remove(super.find(id));
-    }
-
-    public Location find(@PathParam("id") Long id) {
-        return super.find(id);
-    }
-
-    @GET
-    @Override
-    @Produces({"application/xml", "application/json"})
-    public List<Location> findAll() {
-        return super.findAll();
-    }
-
-    @GET
-    @Path("{from}/{to}")
-    @Produces({"application/xml", "application/json"})
-    public List<Location> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
-        return super.findRange(new int[]{from, to});
-    }
-
-    @GET
-    @Path("count")
-    @Produces("text/plain")
-    public String countREST() {
-        return String.valueOf(super.count());
     }
 
     @Override

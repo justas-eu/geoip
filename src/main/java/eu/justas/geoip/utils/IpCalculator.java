@@ -20,8 +20,16 @@ public class IpCalculator {
         for (byte b : inetAddress.getAddress()) {
             result = result << 8 | (b & 0xFF);
         }
-        
+
         return result;
 
+    }
+
+    public static String longToIp(long longIp) {
+        int octet3 = (int) ((longIp >> 24) % 256);
+        int octet2 = (int) ((longIp >> 16) % 256);
+        int octet1 = (int) ((longIp >> 8) % 256);
+        int octet0 = (int) ((longIp) % 256);
+        return octet3 + "." + octet2 + "." + octet1 + "." + octet0;
     }
 }

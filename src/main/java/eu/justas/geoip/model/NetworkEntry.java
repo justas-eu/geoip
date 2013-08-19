@@ -3,11 +3,11 @@ package eu.justas.geoip.model;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -19,14 +19,40 @@ public class NetworkEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @XmlTransient
     private Long startIp;
+    
+    @XmlTransient
+    private Long endIp;
+
     @ManyToOne
     @Column(name = "locationId")
     private Location location;
+    
     @Column(name = "locationId")
     private Long locationId;
+    
+    @Transient
+    private String startIpString;
+
+    @Transient
+    private String endIpString;
+
+    public String getEndIpString() {
+        return endIpString;
+    }
+
+    public void setEndIpString(String endIpString) {
+        this.endIpString = endIpString;
+    }
+
+    public String getStartIpString() {
+        return startIpString;
+    }
+
+    public void setStartIpString(String startIpString) {
+        this.startIpString = startIpString;
+    }
 
     public Long getLocationId() {
         return locationId;
@@ -60,7 +86,6 @@ public class NetworkEntry implements Serializable {
     public void setStartIp(Long startIp) {
         this.startIp = startIp;
     }
-    private Long endIp;
 
     public Long getEndIp() {
         return endIp;
@@ -70,36 +95,33 @@ public class NetworkEntry implements Serializable {
         this.endIp = endIp;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        int hash = 5;
+        hash = 61 * hash + (this.startIp != null ? this.startIp.hashCode() : 0);
+        hash = 61 * hash + (this.locationId != null ? this.locationId.hashCode() : 0);
+        hash = 61 * hash + (this.endIp != null ? this.endIp.hashCode() : 0);
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof NetworkEntry)) {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
-        NetworkEntry other = (NetworkEntry) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NetworkEntry other = (NetworkEntry) obj;
+        if (this.startIp != other.startIp && (this.startIp == null || !this.startIp.equals(other.startIp))) {
+            return false;
+        }
+        if (this.locationId != other.locationId && (this.locationId == null || !this.locationId.equals(other.locationId))) {
+            return false;
+        }
+        if (this.endIp != other.endIp && (this.endIp == null || !this.endIp.equals(other.endIp))) {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return "NetworkEntry{" + "id=" + id + ", startIp=" + startIp + ", location=" + location + ", endIp=" + endIp + '}';
     }
 }
