@@ -6,7 +6,9 @@ The application tells ip address geo location.
 
 Technologies
 ===========
-- TBD
+- Java EE 6
+- CDI
+- JPA
 
 Prerequisites
 ===========
@@ -21,4 +23,4 @@ Install
 mvn install
 </pre>
 
-Adding DB recourse with id JNDI/localmysql on TomEE or GlassFish
+Adding DB resource with id JNDI/localmysql on TomEE or GlassFish
