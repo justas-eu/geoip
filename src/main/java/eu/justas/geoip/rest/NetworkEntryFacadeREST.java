@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -36,8 +35,6 @@ public class NetworkEntryFacadeREST extends AbstractFacade<NetworkEntry> {
     private static final Logger LOG = Logger.getLogger(NetworkEntryFacadeREST.class.getName());
     @PersistenceContext(unitName = "geoip-PU")
     private EntityManager em;
-    @EJB
-    LocationFacadeREST locationFacadeREST;
     @Inject
     @InjectedConfiguration(key = "import.blocks.file", defaultValue = "/tmp/GeoLiteCity-Blocks.csv")
     String importFile;

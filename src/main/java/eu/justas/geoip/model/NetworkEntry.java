@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,7 +27,7 @@ public class NetworkEntry implements Serializable {
     private Long endIp;
 
     @ManyToOne
-    @Column(name = "locationId")
+    @JoinColumn(name = "locationId", insertable=false, updatable=false)
     private Location location;
     
     @Column(name = "locationId")
