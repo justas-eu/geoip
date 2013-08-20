@@ -3,10 +3,15 @@ geoip
 
 Java EE 6 web application.
 The application tells ip address geo location.
+The app is capable of importing maxmind data files in csv format.
+The location table contains ~0.5 million rows and network ~2 millions
 
 Technologies
 ===========
-- TBD
+- Java EE 6
+- CDI
+- JPA
+- OpenCSV
 
 Prerequisites
 ===========
@@ -21,4 +26,4 @@ Install
 mvn install
 </pre>
 
-Adding DB recourse with id JNDI/localmysql on TomEE or GlassFish
+Adding DB resource with id JNDI/localmysql on TomEE or GlassFish
