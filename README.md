@@ -17,7 +17,7 @@ Prerequisites
 ===========
 - Java 6 or 7
 - Maven 3
-- TomEE or GlassFish 
+- TomEE or GlassFish  (tested on TomEE Plus 1.5.2 and GlassFish 4)
 - In use with http://dev.maxmind.com/geoip/legacy/geolite/
 
 Install
