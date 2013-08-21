@@ -7,8 +7,10 @@ package eu.justas.geoip.rest;
 import au.com.bytecode.opencsv.CSVReader;
 import eu.justas.geoip.model.Location;
 import eu.justas.geoip.utils.InjectedConfiguration;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
@@ -48,14 +50,15 @@ public class LocationFacadeREST extends AbstractFacade<Location> {
     public String doImport() {
         long startTime = System.currentTimeMillis();
         CSVReader reader = null;
+        long count = 0;
+
         try {
-            reader = new CSVReader(new FileReader(importFile));
+            reader = new CSVReader(new InputStreamReader(new FileInputStream(importFile), "Windows-1252"));
+
             String[] string;
             reader.readNext();
             LOG.log(Level.INFO, "Started Location import");
 
-
-            long count = 0;
             reader.readNext();
             string = reader.readNext();
             while (string != null && string.length > 0) {
@@ -71,6 +74,15 @@ public class LocationFacadeREST extends AbstractFacade<Location> {
                 Integer areaCode = (string[8].equals("")) ? null : Integer.valueOf(string[8]);
                 Location location = new Location(extId, countryCode, region, city, postalCode, latitude, longtitude, metroCode, areaCode);
                 super.create(location);
+
+                if ((count % 50000) == 0) {
+                    LOG.log(Level.INFO, "Location import in progress: {0}", count);
+                }
+                if ((count % 1000) == 0) {
+                    em.flush();
+                    em.clear();
+                }
+
                 string = reader.readNext();
             }
             LOG.log(Level.INFO, "Location insert count: {0}", count);
@@ -85,10 +97,13 @@ public class LocationFacadeREST extends AbstractFacade<Location> {
                 }
             }
         }
+
+        em.flush();
+        em.clear();
         long endTime = System.currentTimeMillis();
         long seconds = (endTime - startTime) / 1000;
         LOG.log(Level.INFO, "Location import took: {0} s", seconds);
-        return "done";
+        return "Done location entries import. Rows inserted: " + count + ". Duration: " + seconds;
 
     }
 

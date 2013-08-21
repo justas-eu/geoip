@@ -1,7 +1,6 @@
 package eu.justas.geoip.model;
 
 import java.io.Serializable;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -25,17 +24,14 @@ public class NetworkEntry implements Serializable {
     
     @XmlTransient
     private Long endIp;
-
-    @ManyToOne
-    @JoinColumn(name = "locationId", insertable=false, updatable=false)
-    private Location location;
     
-    @Column(name = "locationId")
-    private Long locationId;
+    @ManyToOne
+    @JoinColumn(name = "locationId")
+    private Location location;
     
     @Transient
     private String startIpString;
-
+    
     @Transient
     private String endIpString;
 
@@ -53,14 +49,6 @@ public class NetworkEntry implements Serializable {
 
     public void setStartIpString(String startIpString) {
         this.startIpString = startIpString;
-    }
-
-    public Long getLocationId() {
-        return locationId;
-    }
-
-    public void setLocationId(Long locationId) {
-        this.locationId = locationId;
     }
 
     public NetworkEntry(Long startIp, Long endIp, Location location) {
@@ -100,7 +88,6 @@ public class NetworkEntry implements Serializable {
     public int hashCode() {
         int hash = 5;
         hash = 61 * hash + (this.startIp != null ? this.startIp.hashCode() : 0);
-        hash = 61 * hash + (this.locationId != null ? this.locationId.hashCode() : 0);
         hash = 61 * hash + (this.endIp != null ? this.endIp.hashCode() : 0);
         return hash;
     }
@@ -115,9 +102,6 @@ public class NetworkEntry implements Serializable {
         }
         final NetworkEntry other = (NetworkEntry) obj;
         if (this.startIp != other.startIp && (this.startIp == null || !this.startIp.equals(other.startIp))) {
-            return false;
-        }
-        if (this.locationId != other.locationId && (this.locationId == null || !this.locationId.equals(other.locationId))) {
             return false;
         }
         if (this.endIp != other.endIp && (this.endIp == null || !this.endIp.equals(other.endIp))) {
